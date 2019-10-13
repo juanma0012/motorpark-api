@@ -16,14 +16,15 @@ The response is a list of vehicles
 {"vehicle_id":111,"year":2017,"model_id":25,"model_name":"A6","type_id":1,"type_name":"Sedan","make_id":3,"make_name":"Audi"}]
 
 - Returns a list of vehicles **using** filters with Query string
-> GET http://API_host/vehicles?make[]=1&make[]=4&type[]=1&year[since]=2016&year[ultil]=2018
+> GET http://API_host/vehicles?make=1%2C4&year_since=2016&year_until=2018
 
 The response is a list of vehicles
 Parameters:
- make:  array of make's id, optional.
- type: array of type's id, optional.
- model: array of model's id, optional.
- year: object ({since: 2010, until:2019}), optional
+ make: [1,4], array of make's id, optional.
+ type: [1,2], array of type's id, optional.
+ model:[5,6], array of model's id, optional.
+ year_since: 2016, number, optional.
+ year_until: 2018, number, optional
 
 > {make:[make_id1, make_id2], type[type_id1, type_id2]}
 
@@ -51,10 +52,10 @@ The response is a list of makes
 
 ### Get Models
 Returns a list of vehicles'  models
-> GET http://API_host/models?make[]=1&make[]=4
+> GET http://API_host/models?make=1%2C4
 
 Parameters:
-> {make:[make_id1, make_id2]}
+> {make:[1, 4]}
 
 The response is a list of models
 > [{"id":3,"name":"Picanto","make_id":1,"type_id":2},{"id":4,"name":"Cerato","make_id":1,"type_id":1},{"id":19,"name":"Ranger","make_id":4,"type_id":4},{"id":20,"name":"Fiesta","make_id":4,"type_id":1}]

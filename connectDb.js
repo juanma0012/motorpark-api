@@ -20,6 +20,17 @@ module.exports = class connectDbService {
         });
     }
 
+    checkArrayIntegers(values) {
+        if (values) {
+            return values.split(',').every(value => this.isANumber(value));
+        }
+        return false;
+    }
+
+    isANumber(value) {
+        return !isNaN(Math.trunc(value));
+    }
+
     async getMakes() {
         let sql = `SELECT ${makeTable.fields.id}, ${makeTable.fields.name} 
             FROM ${makeTable.table};`;
@@ -41,13 +52,17 @@ module.exports = class connectDbService {
     }
 
     async getModels(makeIds) {
-        let sql = `SELECT ${modelTable.fields.id}, ${modelTable.fields.name}, ${modelTable.fields.make}, ${modelTable.fields.type} 
-            FROM ${modelTable.table}
-            WHERE ${modelTable.fields.make} IN (${makeIds.join()});`;
-        try {
-            return await this.runQuery(sql);
-        } catch (error) {
-            throw error;
+        if (this.checkArrayIntegers(makeIds)) {
+            let sql = `SELECT ${modelTable.fields.id}, ${modelTable.fields.name}, ${modelTable.fields.make}, ${modelTable.fields.type} 
+                FROM ${modelTable.table}
+                WHERE ${modelTable.fields.make} IN (${makeIds});`;
+            try {
+                return await this.runQuery(sql);
+            } catch (error) {
+                throw error;
+            }
+        } else {
+            throw "Wrong data, please update it";
         }
     }
 
@@ -72,28 +87,28 @@ module.exports = class connectDbService {
         let where = '';
         // Adding conditions to the query if they exits
         if (filters) {
-            if (filters.model) {
-                joinModel += ` AND ${modelTable.table}.${modelTable.fields.id} IN (${filters.model.join()})`;
+            if (this.checkArrayIntegers(filters.model)) {
+                joinModel += ` AND ${modelTable.table}.${modelTable.fields.id} IN (${filters.model})`;
             } else {
-                if (filters.make) {
-                    joinMake += ` AND ${makeTable.table}.${makeTable.fields.id} IN (${filters.make.join()})`;
+                if (this.checkArrayIntegers(filters.make)) {
+                    joinMake += ` AND ${makeTable.table}.${makeTable.fields.id} IN (${filters.make})`;
                 }
-                if (filters.type) {
-                    joinType += ` AND ${typeTable.table}.${typeTable.fields.id} IN (${filters.type.join()})`;
+                if (this.checkArrayIntegers(filters.type)) {
+                    joinType += ` AND ${typeTable.table}.${typeTable.fields.id} IN (${filters.type})`;
                 }
             }
-            if (filters.year) {
+            if (this.isANumber(filters.year_since) || this.isANumber(filters.year_until)) {
                 where += ` WHERE `;
                 let whereWithData = false;
-                if (filters.year.since) {
-                    where += ` ${vehicleTable.table}.${vehicleTable.fields.year} >= ${filters.year.since} `;
+                if (this.isANumber(filters.year_since)) {
+                    where += ` ${vehicleTable.table}.${vehicleTable.fields.year} >= ${filters.year_since} `;
                     whereWithData = true;
                 }
-                if (filters.year.until) {
+                if (this.isANumber(filters.year_until)) {
                     if (whereWithData) {
                         where += ` AND `;
                     }
-                    where += ` ${vehicleTable.table}.${vehicleTable.fields.year} <= ${filters.year.until} `;
+                    where += ` ${vehicleTable.table}.${vehicleTable.fields.year} <= ${filters.year_until} `;
                 }
             }
         }
@@ -109,11 +124,15 @@ module.exports = class connectDbService {
     }
 
     async removeVehicle(vehicleId) {
-        let sql = `DELETE FROM  ${vehicleTable.table} WHERE ${vehicleTable.fields.id} = ${vehicleId};`;
-        try {
-            return await this.runQuery(sql);
-        } catch (error) {
-            throw error;
+        if (this.isANumber(vehicleId)) {
+            let sql = `DELETE FROM  ${vehicleTable.table} WHERE ${vehicleTable.fields.id} = ${vehicleId};`;
+            try {
+                return await this.runQuery(sql);
+            } catch (error) {
+                throw error;
+            }
+        } else {
+            throw "Bad ID, please update it";
         }
     }
 
@@ -127,11 +146,15 @@ module.exports = class connectDbService {
     }
 
     async editVehicle(vehicleId, payload) {
-        let sql = `UPDATE ${vehicleTable.table} SET ${vehicleTable.fields.model} = ${payload.model}, ${vehicleTable.fields.year} = ${payload.year} WHERE ${vehicleTable.fields.id} = ${vehicleId} ;`;
-        try {
-            return await this.runQuery(sql);
-        } catch (error) {
-            throw error;
+        if (this.isANumber(vehicleId)) {
+            let sql = `UPDATE ${vehicleTable.table} SET ${vehicleTable.fields.model} = ${payload.model}, ${vehicleTable.fields.year} = ${payload.year} WHERE ${vehicleTable.fields.id} = ${vehicleId} ;`;
+            try {
+                return await this.runQuery(sql);
+            } catch (error) {
+                throw error;
+            }
+        } else {
+            throw "Bad ID, please update it";
         }
     }
 

@@ -117,36 +117,3 @@ server.get('/', function (req, res, next) {
 server.listen(api_port, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
-
-/* //rest api to get a single employee data
-server.get('/vehicles/:id', function (req, res) {
-    connection.query('select * from employee where id=?', [req.params.id], function (error, results, fields) {
-        if (error) next(new Error(error));
-        res.end(JSON.stringify(results));
-    });
-});
-
-//rest api to create a new record into mysql database
-server.post('/vehicles', function (req, res) {
-    var postData = req.body;
-    connection.query('INSERT INTO employee SET ?', postData, function (error, results, fields) {
-        if (error) throw error;
-        res.end(JSON.stringify(results));
-    });
-});
-
-//rest api to update record into mysql database
-server.put('/vehicles', function (req, res) {
-    connection.query('UPDATE `employee` SET `employee_name`=?,`employee_salary`=?,`employee_age`=? where `id`=?', [req.body.employee_name, req.body.employee_salary, req.body.employee_age, req.body.id], function (error, results, fields) {
-        if (error) throw error;
-        res.end(JSON.stringify(results));
-    });
-});
-
-//rest api to delete record from mysql database
-server.delete('/vehicles/:id', function (req, res) {
-    connection.query('DELETE FROM `employee` WHERE `id`=?', [req.params.id], function (error, results, fields) {
-        if (error) throw error;
-        res.end('Record has been deleted!');
-    });
-}); */
