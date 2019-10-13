@@ -66,7 +66,7 @@ server.get('/types', function (req, res, next) {
 // Get all results from models
 server.get('/models', function (req, res, next) {
     let make = req.query.make;
-    if(make){
+    if (make) {
         connection.getModels(make).then(results => {
             res.send(results);
             return next();
@@ -75,7 +75,7 @@ server.get('/models', function (req, res, next) {
         });
     } else {
         res.send({});
-            return next();
+        return next();
     }
 });
 
