@@ -40,10 +40,10 @@ module.exports = class connectDbService {
         }
     }
 
-    async getModels(makeId) {
+    async getModels(makeIds) {
         let sql = `SELECT ${modelTable.fields.id}, ${modelTable.fields.name}, ${modelTable.fields.make}, ${modelTable.fields.type} 
             FROM ${modelTable.table}
-            WHERE ${modelTable.fields.make} = ${makeId};`;
+            WHERE ${modelTable.fields.make} IN (${makeIds.join()});`;
         try {
             return await this.runQuery(sql);
         } catch (error) {
@@ -101,6 +101,33 @@ module.exports = class connectDbService {
         let orderBy = `ORDER BY  ${makeTable.table}.${makeTable.fields.name}, ${modelTable.table}.${modelTable.fields.name}, ${typeTable.table}.${typeTable.fields.name}`;
         // Whole query
         let sql = `${select} FROM ${vehicleTable.table} ${joinModel} ${joinMake} ${joinType} ${where} ${orderBy}`;
+        try {
+            return await this.runQuery(sql);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async removeVehicle(vehicleId) {
+        let sql = `DELETE FROM  ${vehicleTable.table} WHERE ${vehicleTable.fields.id} = ${vehicleId};`;
+        try {
+            return await this.runQuery(sql);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async addVehicle(payload) {
+        let sql = `INSERT INTO ${vehicleTable.table} (${vehicleTable.fields.model}, ${vehicleTable.fields.year}) VALUES (${payload.model}, ${payload.year});`;
+        try {
+            return await this.runQuery(sql);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async editVehicle(vehicleId, payload) {
+        let sql = `UPDATE ${vehicleTable.table} SET ${vehicleTable.fields.model} = ${payload.model}, ${vehicleTable.fields.year} = ${payload.year} WHERE ${vehicleTable.fields.id} = ${vehicleId} ;`;
         try {
             return await this.runQuery(sql);
         } catch (error) {
