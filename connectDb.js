@@ -113,7 +113,7 @@ module.exports = class connectDbService {
             }
         }
         // Ordering the results for the query
-        let orderBy = `ORDER BY  ${makeTable.table}.${makeTable.fields.name}, ${modelTable.table}.${modelTable.fields.name}, ${typeTable.table}.${typeTable.fields.name}`;
+        let orderBy = `ORDER BY  ${vehicleTable.table}.${vehicleTable.fields.year} DESC, ${makeTable.table}.${makeTable.fields.name}, ${modelTable.table}.${modelTable.fields.name}, ${typeTable.table}.${typeTable.fields.name}`;
         // Whole query
         let sql = `${select} FROM ${vehicleTable.table} ${joinModel} ${joinMake} ${joinType} ${where} ${orderBy}`;
         try {
@@ -137,16 +137,20 @@ module.exports = class connectDbService {
     }
 
     async addVehicle(payload) {
-        let sql = `INSERT INTO ${vehicleTable.table} (${vehicleTable.fields.model}, ${vehicleTable.fields.year}) VALUES (${payload.model}, ${payload.year});`;
-        try {
-            return await this.runQuery(sql);
-        } catch (error) {
-            throw error;
+        if (this.isANumber(payload.model) && this.isANumber(payload.year)) {
+            let sql = `INSERT INTO ${vehicleTable.table} (${vehicleTable.fields.model}, ${vehicleTable.fields.year}) VALUES (${payload.model}, ${payload.year});`;
+            try {
+                return await this.runQuery(sql);
+            } catch (error) {
+                throw error;
+            }
+        } else {
+            throw "Wrong data, please update it";
         }
     }
 
     async editVehicle(vehicleId, payload) {
-        if (this.isANumber(vehicleId)) {
+        if (this.isANumber(vehicleId) && this.isANumber(payload.model) && this.isANumber(payload.year)) {
             let sql = `UPDATE ${vehicleTable.table} SET ${vehicleTable.fields.model} = ${payload.model}, ${vehicleTable.fields.year} = ${payload.year} WHERE ${vehicleTable.fields.id} = ${vehicleId} ;`;
             try {
                 return await this.runQuery(sql);
@@ -154,7 +158,7 @@ module.exports = class connectDbService {
                 throw error;
             }
         } else {
-            throw "Bad ID, please update it";
+            throw "Wrong data, please update it";
         }
     }
 
